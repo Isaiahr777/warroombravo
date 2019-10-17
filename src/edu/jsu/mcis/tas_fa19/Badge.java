@@ -18,6 +18,6 @@ public class Badge {
     public String getDescription() {
         return description;
     }
-    
-    
+
+ 
 }
