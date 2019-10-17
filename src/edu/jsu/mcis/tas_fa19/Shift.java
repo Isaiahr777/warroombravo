@@ -1,16 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package edu.jsu.mcis.tas_fa19;
 
 import java.time.LocalTime;
 
-/**
- *
- * @author Jacob
- */
+
 public class Shift {
     private int lunchduration;
     
