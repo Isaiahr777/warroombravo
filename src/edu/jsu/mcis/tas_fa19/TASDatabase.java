@@ -34,23 +34,23 @@ public class TASDatabase {
         STATE = conn.createStatement();
         qBadges = "select from badge where id = '"+ badge +"'";
         ResultSet RS = STATE.executeQuery(qBadges);
-
+         
         String badgeId = null;
         String badgeDescription = null;
         
         while(RS.next()){
             badgeId = RS.getString("Id");
             badgeDescription = RS.getString("Description");
-        }
+     }
         close(STATE);
-
+        
         Badge B = new Badge(badgeId, badgeDescription);
         
         return B;
     }
      
     
-     public void close(Statement STATE){
+    public void close(Statement STATE){
         try {
             STATE.close();
         } 
