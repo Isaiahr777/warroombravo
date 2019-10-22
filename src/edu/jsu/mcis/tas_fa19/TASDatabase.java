@@ -5,51 +5,58 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TASDatabase {
-    
-    private static Connection conn = null;
-    private String myUrl = null;
-    private String qBadges = null;
-    private String qPunched = null;
-    private String qShifted= null;
-    private Statement STATE;
-    
-    public TASDatabase() throws ClassNotFoundException{
-        
+
+    private Connection conn;
+
+    public TASDatabase(){
+
+
         try{
-            myUrl = "jdbc:mysql://localhost/tas";
+            String myUrl = "jdbc:mysql://localhost/tas";
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(myUrl,"Tasuser", "tasuser");
-               
+
         } 
-        catch (SQLException ex) {
+        catch (Exception ex) {
             System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
+
         }
     }
-    
-    
-     public Badge getBadge(String badge) throws SQLException{
 
-        STATE = conn.createStatement();
-        qBadges = "select from badge where id = '"+ badge +"'";
-        ResultSet RS = STATE.executeQuery(qBadges);
 
-        String badgeId = null;
-        String badgeDescription = null;
-        
-        while(RS.next()){
-            badgeId = RS.getString("Id");
-            badgeDescription = RS.getString("Description");
-        }
-        close(STATE);
+     public Badge getBadge(String id){
+         Badge b = null;
+         String query = "SELECT * FROM badge WHERE id = ?";
 
-        Badge B = new Badge(badgeId, badgeDescription);
-        
-        return B;
-    }
-     
-    
+
+         try{
+            PreparedStatement state = conn.prepareStatement(query);
+            state.setString(1, id);
+
+            boolean hasresults = state.execute();
+            ResultSet result = null;
+
+            if ( hasresults ){
+                ResultSet resultset = state.getResultSet();
+                resultset.next();
+                String ID = result.getString("id");
+                String desc = result.getString("description");
+
+            }
+            result.close();
+            state.close();
+
+
+         }
+
+         catch (Exception ex){
+
+                 }
+         return b;
+
+       }
+
+
      public void close(Statement STATE){
         try {
             STATE.close();
@@ -58,5 +65,4 @@ public class TASDatabase {
             Logger.getLogger(TASDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
 }

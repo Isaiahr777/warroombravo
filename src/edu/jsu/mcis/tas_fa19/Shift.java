@@ -76,8 +76,10 @@ public class Shift {
         return lunchdeduct;
     }
     
+    @Override
     public String toString(){
         return description + start + stop + interval + dock + lunchstart + lunchstop + lunchdeduct;
     }
+    
     
 }
