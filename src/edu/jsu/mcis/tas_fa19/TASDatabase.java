@@ -125,8 +125,8 @@ public class TASDatabase {
      }
      public Punch getPunch(String punch) throws SQLException{
           STATE = conn.createStatement();
-         qShifted = "select from shift where id = '"+ punch +"'";
-         ResultSet RS = STATE.executeQuery(qShifted);
+         qPunched = "select from shift where id = '"+ punch +"'";
+         ResultSet RS = STATE.executeQuery(qPunched);
          
          Badge badge = null;
          int punchID = 0;
