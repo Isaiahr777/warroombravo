@@ -181,8 +181,7 @@ public class TASDatabase {
                  originalTimeStamp = result.getLong("originaltimestamp");
                  punchTypeID = result.getInt("punchtypeid");
                  
-                 P = new Punch(badge, punchID, terminalId, badgeID, originalTimeStamp,
-                         punchTypeID, adjustmentType);
+                 P = new Punch(badge, terminalId, punchTypeID);
              }
              result.close();
              state.close();
