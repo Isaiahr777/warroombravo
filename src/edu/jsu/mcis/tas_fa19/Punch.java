@@ -11,7 +11,7 @@ public class Punch {
     private String adjustmenttype;
     private Badge badge;
 
-    public Punch(Badge badge, int id, int terminalid, String badgeid, long originalTimeStamp, int punchid, String adjustmenttype) {
+    public Punch(Badge badge, int terminalid, int punchtypeid) {
         this.id = id;
         this.terminalid = terminalid;
         this.badgeid = badgeid;

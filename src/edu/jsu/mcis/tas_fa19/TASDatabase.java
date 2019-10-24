@@ -200,12 +200,12 @@ public class TASDatabase {
          
          long stamp = p.getOriginaltimestamp();
          int tId = p.getTerminalid();
-         int pId = p.getPunchid();
+         int pId = p.getPunchtypeid();
          String badgeid = p.getBadgeid();
          String aType = p.getAdjustmenttype();
          
          String iPunch = "INSERT INTO punch (badgeid, terminalid, punchtypeid" 
-                 + "VALUES (badgeid, tId, aType)";
+                 + "VALUES (badgeid, tId, pId)";
          
          try{
              Statement state = conn.createStatement();
@@ -215,7 +215,7 @@ public class TASDatabase {
              
          }
          
-         return p.getPunchid();
+         return p.getId();
      }
 
      public void close(Statement STATE){
