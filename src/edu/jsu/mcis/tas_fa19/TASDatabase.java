@@ -194,6 +194,29 @@ public class TASDatabase {
          return P;
          
      }
+     public int insertPunch(Punch p){
+         
+         //getter methods as variables
+         
+         long stamp = p.getOriginaltimestamp();
+         int tId = p.getTerminalid();
+         int pId = p.getPunchid();
+         String badgeid = p.getBadgeid();
+         String aType = p.getAdjustmenttype();
+         
+         String iPunch = "INSERT INTO punch (badgeid, terminalid, punchtypeid" 
+                 + "VALUES (badgeid, tId, aType)";
+         
+         try{
+             Statement state = conn.createStatement();
+             state.executeUpdate(iPunch);
+         }
+         catch(Exception e){
+             
+         }
+         
+         return p.getPunchid();
+     }
 
      public void close(Statement STATE){
         try {

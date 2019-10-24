@@ -33,11 +33,11 @@ public class Punch {
         return badgeid;
     }
 
-    public long getOriginalTimeStamp() {
+    public long getOriginaltimestamp() {
         return originalTimeStamp;
     }
 
-    public int getPunchid() {
+    public int getPunchtypeid() {
         return punchid;
     }
 
