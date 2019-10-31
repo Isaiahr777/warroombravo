@@ -2,6 +2,9 @@ package edu.jsu.mcis.tas_fa19;
 
 import java.sql.*;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -216,6 +219,80 @@ public class TASDatabase {
          
          return p.getId();
      }
+        public ArrayList<Punch> getDailyPunchList(Badge badge, long ts){
+            
+            Punch P = null;
+            
+            GregorianCalendar gc1 = new GregorianCalendar();
+            GregorianCalendar gc2 = new GregorianCalendar();
+            
+            gc1.setTimeInMillis(ts);
+            gc2.setTimeInMillis(ts);
+            
+            gc1.set(Calendar.HOUR, 0);
+            gc1.set(Calendar.MINUTE, 0);
+            gc1.set(Calendar.SECOND, 0);
+            
+            gc2.set(Calendar.HOUR, 23);
+            gc2.set(Calendar.MINUTE, 59);
+            gc2.set(Calendar.SECOND, 59);
+            
+            long dayStart = gc1.getTimeInMillis();
+            long dayEnd = gc2.getTimeInMillis();
+            
+            
+            
+            
+            String query1 = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) * 1000 as ts FROM punch"
+                          + "WHERE badgeid = '?' "
+                          + "HAVING ts >= ? and ts <= ?"
+                          + "ORDER BY originaltimestamp";
+            
+            String query2 = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) * 1000 as ts FROM punch"
+                          + "WHERE badgeid = '?' "
+                          + "HAVING ts > '?' "
+                          + "ORDER BY originaltimestamp"
+                          + "LIMIT 1";
+            
+            
+            try{
+                
+                
+                
+                PreparedStatement state = conn.prepareStatement(query1);
+                boolean hasresults = state.execute();
+                ResultSet result = null;
+
+                if ( hasresults ) {
+                
+                ResultSet resultset = state.getResultSet();
+                while(resultset.next()){
+                    state.setString(1, badge.getId());
+                    state.setLong(2, dayStart);
+                    state.setLong(3, dayEnd);
+                    
+                    P = new Punch();
+                
+                }
+                
+               
+                
+                
+                
+                }
+            }
+            
+            
+            
+            
+            
+            catch(Exception e){
+                
+            }
+            return null;
+        
+            }
+        
 
      public void close(Statement STATE){
         try {
