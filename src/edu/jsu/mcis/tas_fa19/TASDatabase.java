@@ -1,6 +1,7 @@
 package edu.jsu.mcis.tas_fa19;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,16 +16,14 @@ public class TASDatabase {
     public TASDatabase(){
 
 
-        try{
+        try {
+            
             String myUrl = "jdbc:mysql://localhost/tas";
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(myUrl,"Tasuser", "tasuser");
+            conn = DriverManager.getConnection(myUrl,"War_Room_Bravo", "CS488");
 
         } 
-        catch (Exception ex) {
-            System.out.println("SQLException: " + ex.getMessage());
-
-        }
+        catch (Exception e) { e.printStackTrace(); }
     }
 
 
@@ -39,20 +38,25 @@ public class TASDatabase {
             state.setString(1, id);
 
             boolean hasresults = state.execute();
-            ResultSet result = null;
 
             if ( hasresults ) {
                 
                 ResultSet resultset = state.getResultSet();
-                resultset.next();
-                String ID = result.getString("id");
-                String desc = result.getString("description");
                 
-                b = new Badge(ID, desc);
+                if (resultset.next()) {
+                    
+                    String ID = resultset.getString("id");
+                    String desc = resultset.getString("description");
+                    
+                    b = new Badge(ID, desc);
+                    
+                }
+                
+                resultset.close();                
 
             }
             
-            result.close();
+            
             state.close();
 
         }
@@ -221,77 +225,82 @@ public class TASDatabase {
      }
         public ArrayList<Punch> getDailyPunchList(Badge badge, long ts){
             
-            Punch P = null;
-            
+            ArrayList<Punch> punchlist = new ArrayList<>();
+                        
             GregorianCalendar gc1 = new GregorianCalendar();
             GregorianCalendar gc2 = new GregorianCalendar();
             
             gc1.setTimeInMillis(ts);
             gc2.setTimeInMillis(ts);
             
-            gc1.set(Calendar.HOUR, 0);
+            gc1.set(Calendar.HOUR_OF_DAY, 0);
             gc1.set(Calendar.MINUTE, 0);
             gc1.set(Calendar.SECOND, 0);
             
-            gc2.set(Calendar.HOUR, 23);
+            gc2.set(Calendar.HOUR_OF_DAY, 23);
             gc2.set(Calendar.MINUTE, 59);
             gc2.set(Calendar.SECOND, 59);
             
             long dayStart = gc1.getTimeInMillis();
             long dayEnd = gc2.getTimeInMillis();
             
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE d MMM yyyy HH:mm:ss");
             
+            System.err.println("dayStart: " + sdf.format(gc1.getTime()) + ": " + dayStart);
+            System.err.println("dayEnd: " + sdf.format(gc2.getTime()) + ": " + dayEnd);
             
-            
-            String query1 = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) * 1000 as ts FROM punch"
-                          + "WHERE badgeid = '?' "
-                          + "HAVING ts >= ? and ts <= ?"
+            String query1 = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) * 1000 as ts FROM punch "
+                          + "WHERE badgeid = ? "
+                          + "HAVING ts >= ? and ts <= ? "
                           + "ORDER BY originaltimestamp";
             
-            String query2 = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) * 1000 as ts FROM punch"
-                          + "WHERE badgeid = '?' "
-                          + "HAVING ts > '?' "
-                          + "ORDER BY originaltimestamp"
+            String query2 = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) * 1000 as ts FROM punch "
+                          + "WHERE badgeid = ? "
+                          + "HAVING ts > ? "
+                          + "ORDER BY originaltimestamp "
                           + "LIMIT 1";
             
             
-            try{
+            try {
                 
                 
                 
                 PreparedStatement state = conn.prepareStatement(query1);
+                
+                state.setString(1, badge.getId());
+                state.setLong(2, dayStart);
+                state.setLong(3, dayEnd);
+                
                 boolean hasresults = state.execute();
-                ResultSet result = null;
 
                 if ( hasresults ) {
                 
-                ResultSet resultset = state.getResultSet();
-                while(resultset.next()){
-                    state.setString(1, badge.getId());
-                    state.setLong(2, dayStart);
-                    state.setLong(3, dayEnd);
+                    ResultSet resultset = state.getResultSet();
                     
-                    P = new Punch();
-                
+                    while( resultset.next() ) {
+                        
+                        int id = resultset.getInt("id");
+                        String badgeid = resultset.getString("badgeid");                        
+                        int terminalid = resultset.getInt("terminalid");
+                        int punchtypeid = resultset.getInt("punchtypeid");
+                        long ots = resultset.getLong("ts");
+                        
+                        Badge b = getBadge(badgeid);
+
+                        Punch p = new Punch(id, b, terminalid, punchtypeid, ots);
+                        punchlist.add(p);
+
+                    }
+                    
                 }
                 
-               
-                
-                
-                
-                }
             }
             
+            catch(Exception e) { e.printStackTrace(); }
             
-            
-            
-            
-            catch(Exception e){
-                
-            }
-            return null;
+            return punchlist;
         
-            }
+    }
         
 
      public void close(Statement STATE){
