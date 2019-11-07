@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,100 +66,103 @@ public class TASDatabase {
         return b;
 
     }
-     public Shift getShift(int shift){
-         Shift shifts = null;
+     public Shift getShift(int shiftid){
          
-         int shiftID = 0;
-         int lunchDuration = 0;
-         String shiftDescription = null;
-         LocalTime start= null;
-         LocalTime stop = null;
-         int interval=0;
-         int gracePeriod=0;
-         int dock=0;
-         LocalTime lunchStart = null;
-         LocalTime lunchStop = null;
-         int lunchDeduct=0;
-         
-         String qShifted = "SELECT * FROM shift WHERE shift = ?";
-        
-         try{
-             PreparedStatement state = conn.prepareStatement(qShifted);
-             state.setInt(1, shift);
+        Shift s = null;
+
+        String query = "SELECT *,\n" +
+        "HOUR(`start`) AS starthour, MINUTE(`start`) AS startminute,\n" +
+        "HOUR(`stop`) AS stophour, MINUTE(`stop`) AS stopminute,\n" +
+        "HOUR(`lunchstart`) AS lstarthour, MINUTE(`lunchstart`) AS lstartminute,\n" +
+        "HOUR(`lunchstop`) AS lstophour, MINUTE(`lunchstop`) AS lstopminute\n" +
+        "FROM shift s WHERE id = ?";
+
+        try {
+            
+             PreparedStatement state = conn.prepareStatement(query);
+             state.setInt(1, shiftid);
              
              boolean hasresults = state.execute();
-             ResultSet result = null;
              
-             if (hasresults){
-                 ResultSet resultset = state.getResultSet();
-                 resultset.next();
-                 shiftID = result.getInt("id");
-                 shiftDescription = result.getString("description");
-                 start = (LocalTime) result.getObject("start");
-                 stop = (LocalTime) result.getObject("stop");
-                 interval = result.getInt("interval");
-                 gracePeriod = result.getInt("graceperiod");
-                 dock = result.getInt("dock");
-                 lunchStart = (LocalTime) result.getObject("lunchstart");
-                 lunchStop = (LocalTime) result.getObject("lunchstop");
-                 lunchDeduct = result.getInt("lunchdeduct");
+             if (hasresults) {
                  
-                 shifts = new Shift(shiftID, lunchDuration, shiftDescription, start, stop, interval,
-                            gracePeriod, dock, lunchStart,lunchStop, lunchDeduct);
+                ResultSet resultset = state.getResultSet();
+
+                if (resultset.next()) {
+                    
+                    HashMap<String, String> parameters = new HashMap<>();
+                    
+                    parameters.put("id", String.valueOf(resultset.getInt("id")));
+
+                    parameters.put("description", resultset.getString("description"));
+                    
+                    parameters.put("starthour", String.valueOf(resultset.getInt("starthour")));
+                    parameters.put("startminute", String.valueOf(resultset.getInt("startminute")));
+                    parameters.put("stophour", String.valueOf(resultset.getInt("stophour")));
+                    parameters.put("stopminute", String.valueOf(resultset.getInt("stopminute")));
+                    
+                    parameters.put("lstarthour", String.valueOf(resultset.getInt("lstarthour")));
+                    parameters.put("lstartminute", String.valueOf(resultset.getInt("lstartminute")));
+                    parameters.put("lstophour", String.valueOf(resultset.getInt("lstophour")));
+                    parameters.put("lstopminute", String.valueOf(resultset.getInt("lstopminute")));
+                    
+                    parameters.put("interval", String.valueOf(resultset.getInt("interval")));
+                    parameters.put("graceperiod", String.valueOf(resultset.getInt("graceperiod")));
+                    parameters.put("dock", String.valueOf(resultset.getInt("dock")));
+                    parameters.put("lunchdeduct", String.valueOf(resultset.getInt("lunchdeduct")));
+                    
+                    s = new Shift(parameters);
+                    
+                    resultset.close();
+
+                }
+
              }
-             result.close();
+             
              state.close();
          }
          catch (Exception ex){ ex.printStackTrace();}
 
-         return shifts;
+         return s;
+         
      }
     
-     public Shift getShift(Badge badge){
-         Shift shifts = null;
-         int shiftID = 0;
-         int lunchDuration = 0;
-         String shiftDescription = null;
-         LocalTime start= null;
-         LocalTime stop = null;
-         int interval=0;
-         int gracePeriod=0;
-         int dock=0;
-         LocalTime lunchStart = null;
-         LocalTime lunchStop = null;
-         int lunchDeduct=0;
+    public Shift getShift(Badge badge) {
          
-         String qShifted = "select from shift where id = ?";
-         try{
-             PreparedStatement state = conn.prepareStatement(qShifted);
-             state.setObject(1, badge);
+        String badgeid = badge.getId();
+        Shift s = null;
+        
+        String query = "SELECT shiftid FROM employee WHERE badgeid = ?";
+
+        try {
+            
+             PreparedStatement state = conn.prepareStatement(query);
+             state.setString(1, badgeid);
              
              boolean hasresults = state.execute();
-             ResultSet result = null;
              
-             if (hasresults){
-                 ResultSet resultset = state.getResultSet();
-                 resultset.next();
-                 shiftID = result.getInt("id");
-                 shiftDescription = result.getString("description");
-                 start = (LocalTime) result.getObject("start");
-                 stop = (LocalTime) result.getObject("stop");
-                 interval = result.getInt("interval");
-                 gracePeriod = result.getInt("graceperiod");
-                 dock = result.getInt("dock");
-                 lunchStart = (LocalTime) result.getObject("lunchstart");
-                 lunchStop = (LocalTime) result.getObject("lunchstop");
-                 lunchDeduct = result.getInt("lunchdeduct");
+             if (hasresults) {
                  
-                 shifts = new Shift(shiftID, lunchDuration, shiftDescription, start, stop, interval,
-                            gracePeriod, dock, lunchStart,lunchStop, lunchDeduct);
-             }
-             result.close();
-             state.close();
-         }
-         catch (Exception ex){ ex.printStackTrace();}
+                ResultSet resultset = state.getResultSet();
 
-         return shifts;
+                if (resultset.next()) {
+                    
+                    int shiftid = resultset.getInt(1);                    
+                    s = getShift(shiftid);
+                    
+                    resultset.close();
+
+                }
+
+            }
+
+            state.close();
+            
+        }
+        catch (Exception ex){ ex.printStackTrace();}
+
+        return s;
+        
      }
      public Punch getPunch(int punch){
          Punch P = null;

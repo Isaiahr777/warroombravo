@@ -10,7 +10,14 @@ public class Main {
         
         TASDatabase db = new TASDatabase();
         
-        GregorianCalendar ts = new GregorianCalendar();
+        Badge b = new Badge("021890C0", "");
+        
+        Shift s = db.getShift(b);
+        
+        System.out.println("Shift 1: 07:00 - 15:30 (510 minutes); Lunch: 12:00 - 12:30 (30 minutes)");
+        System.out.println(s);
+        
+        /*GregorianCalendar ts = new GregorianCalendar();
         
         ts.set(Calendar.DAY_OF_MONTH, 17);
         ts.set(Calendar.YEAR, 2018);
@@ -26,7 +33,7 @@ public class Main {
         
         for (Punch p : p1) {
             System.out.println(p);
-        }
+        }*/
         
     }
     

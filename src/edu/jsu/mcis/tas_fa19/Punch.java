@@ -76,12 +76,6 @@ public class Punch {
     }
     
     public String printOriginalTimestamp(){
-        return null;
-    }
-    
-    @Override
-    public String toString() {
-        
         StringBuilder s = new StringBuilder();
         
         GregorianCalendar ots = new GregorianCalendar();
@@ -91,18 +85,25 @@ public class Punch {
         // "#D2C39273 CLOCKED IN: WED 09/05/2018 07:00:07" (use SimpleDateFormat)
         // Add Badge ID and punch type to StringBuilder
         
-        s.append(id).append(": ");
+        
+        s.append("#").append(badge.getId()).append(" CLOCKED IN: ");
         
         // INSERT YOUR CODE HERE
         
         // Add OriginalTimeStamp to StringBuilder        
         
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE d MMM yyyy HH:mm:ss");
-        s.append( sdf.format(d) );
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MM/dd/yyyy HH:mm:ss");
+        s.append(sdf.format(d).toUpperCase() );
         
         // Compose output string and return
         
         return ( s.toString() );
+    }
+    
+    @Override
+    public String toString() {
+        
+        return ( printOriginalTimestamp() );
         
     }
     
