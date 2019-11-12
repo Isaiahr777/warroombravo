@@ -20,7 +20,12 @@ public class Badge {
     
     @Override
     public String toString(){
-        return id + description;
+        StringBuilder s = new StringBuilder();
+        
+        s.append("#").append(id);
+        s.append(" (").append(description).append(")");
+      
+        return s.toString();
     }
  
 }

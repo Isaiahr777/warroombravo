@@ -51,9 +51,9 @@ public class TASDatabase {
                     
                     b = new Badge(ID, desc);
                     
-                }
-                
-                resultset.close();                
+                    resultset.close();
+                    
+                }               
 
             }
             
