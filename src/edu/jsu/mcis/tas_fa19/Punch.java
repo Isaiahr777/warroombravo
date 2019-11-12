@@ -1,4 +1,3 @@
-
 package edu.jsu.mcis.tas_fa19;
 
 import java.text.SimpleDateFormat;
