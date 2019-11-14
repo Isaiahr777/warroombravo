@@ -166,40 +166,33 @@ public class TASDatabase {
      }
      public Punch getPunch(int punch){
          Punch P = null;
-         String qPunched = "SELECT * FROM punch WHERE punch = ?";
-         
-         Badge badge = null;
-         int punchID = 0;
-         int terminalId = 0;
-         String badgeID = null;
-         long originalTimeStamp = 0;
-         int punchTypeID = 0;
-         String adjustmentType = null;
+         String qPunched = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) * 1000 AS ts FROM punch WHERE id = ?";
          
          try{
              PreparedStatement state = conn.prepareStatement(qPunched);
              state.setInt(1, punch);
              
              boolean hasresults = state.execute();
-             ResultSet result = null;
              
              if (hasresults){
                  ResultSet resultset = state.getResultSet();
                  resultset.next();
-                 punchID = result.getInt("id");
-                 terminalId = result.getInt("terminalid");
-                 badgeID = result.getString("badgeid");
-                 originalTimeStamp = result.getLong("originaltimestamp");
-                 punchTypeID = result.getInt("punchtypeid");
+                 int punchID = resultset.getInt("id");
+                 int terminalId = resultset.getInt("terminalid");
+                 String badgeID = resultset.getString("badgeid");
+                 long originalTimeStamp = resultset.getLong("ts");
+                 int punchTypeID = resultset.getInt("punchtypeid");
                  
-                 P = new Punch(badge, terminalId, punchTypeID);
+                 Badge badge = getBadge(badgeID);
+                 
+                 P = new Punch(punchID, badge, terminalId, punchTypeID, originalTimeStamp);
+                 
+                 resultset.close();
              }
-             result.close();
+             
              state.close();
          }
-         catch (Exception ex){
-             
-         }
+         catch (Exception ex){ ex.printStackTrace(); }
        
          return P;
          

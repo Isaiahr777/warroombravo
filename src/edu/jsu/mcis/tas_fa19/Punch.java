@@ -11,11 +11,14 @@ public class Punch {
     private int terminalid;
     private String badgeid;
     private long originalTimeStamp;
-    private long adjustedTimeSamp;
+    private long adjustedTimeStamp;
     private int punchtypeid;
     
     private String adjustmenttype;
     private Badge badge;
+    
+    public static final String[] PUNCH_DESCRIPTION = new String[]{" CLOCKED OUT: ", 
+        " CLOCKED IN: ", " TIMED OUT: "};
 
     public Punch(Badge badge, int terminalid, int punchtypeid) {
         
@@ -30,7 +33,7 @@ public class Punch {
         
         GregorianCalendar now = new GregorianCalendar();
         this.originalTimeStamp = now.getTimeInMillis();
-        this.adjustedTimeSamp = now.getTimeInMillis();
+        this.adjustedTimeStamp = now.getTimeInMillis();
         
     }
     
@@ -46,7 +49,7 @@ public class Punch {
         this.adjustmenttype = null;
         
         this.originalTimeStamp = originaltimestamp;
-        this.adjustedTimeSamp = originaltimestamp;
+        this.adjustedTimeStamp = originaltimestamp;
         
     }
 
@@ -85,7 +88,7 @@ public class Punch {
         // Add Badge ID and punch type to StringBuilder
         
         
-        s.append("#").append(badge.getId()).append(" CLOCKED IN: ");
+        s.append("#").append(badge.getId()).append(PUNCH_DESCRIPTION[punchtypeid]);
         
         // INSERT YOUR CODE HERE
         
@@ -101,6 +104,12 @@ public class Punch {
     
     @Override
     public String toString() {
+        
+        
+        //StringBuilder s = new StringBuilder();
+         //s.append("#").append(getId()).append(" ").append(punchDescription[punchtypeid]).append 
+         
+         
         
         return ( printOriginalTimestamp() );
         
