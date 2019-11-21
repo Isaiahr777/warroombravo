@@ -10,7 +10,7 @@ public class Punch {
     private int id;
     private int terminalid;
     private String badgeid;
-    private long originalTimeStamp;
+    private final long originalTimeStamp;
     private long adjustedTimeStamp;
     private int punchtypeid;
     

@@ -52,6 +52,8 @@ public class Feature2 {
 
         rts.setTimeInMillis(p2.getOriginaltimestamp());
         
+        System.err.println(rts.getTime());
+        
         assertEquals(originaltimestamp, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(rts.getTime()));
         assertEquals(terminalid, p2.getTerminalid());
         assertEquals(eventtypeid, p2.getPunchtypeid());

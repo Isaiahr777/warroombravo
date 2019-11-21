@@ -197,7 +197,9 @@ public class TASDatabase {
          return P;
          
      }
-     public int insertPunch(Punch p){
+     public int insertPunch(Punch p) {
+         
+         int key = 0;
          
          //getter methods as variables
          
@@ -207,19 +209,43 @@ public class TASDatabase {
          String badgeid = p.getBadgeid();
          String aType = p.getAdjustmenttype();
          
-         String iPunch = "INSERT INTO punch (badgeid, terminalid, punchtypeid" 
+         GregorianCalendar ots = new GregorianCalendar();
+         ots.setTimeInMillis(stamp);
+         
+         
+         /*String iPunch = "INSERT INTO punch (badgeid, terminalid, punchtypeid)" 
                  + "VALUES (badgeid, tId, pId)";
+         */
          
-         try{
-             Statement state = conn.createStatement();
-             state.executeUpdate(iPunch);
-         }
-         catch(Exception e){
-             
-         }
+         try {
          
-         return p.getId();
+            String iPunch = "INSERT INTO punch (terminalid, badgeid, punchtypeid, "
+                    + "originaltimestamp) VALUES (?, ?, ?, ?)";
+
+            PreparedStatement pstmt = conn.prepareStatement(iPunch, PreparedStatement.RETURN_GENERATED_KEYS);
+            pstmt.setInt(1, tId);
+            pstmt.setString(2, badgeid);
+            pstmt.setInt(3, pId);
+            pstmt.setString(4, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(ots.getTime()));
+                        
+            int result = pstmt.executeUpdate();
+            
+            if (result == 1) {
+                
+                ResultSet keys = pstmt.getGeneratedKeys();
+                
+                if (keys.next()) {
+                    key = keys.getInt(1);
+                }
+                
+            }
+            
+         }
+         catch(Exception e) { e.printStackTrace(); }
+         
+         return key;
      }
+     
         public ArrayList<Punch> getDailyPunchList(Badge badge, long ts){
             
             ArrayList<Punch> punchlist = new ArrayList<>();
